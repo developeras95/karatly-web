@@ -1,0 +1,56 @@
+# The whole of Karatly on your computer: database, API and this web app.
+#
+#   docker compose up -d --build    build everything and start it
+#   open http://localhost:3001      the app      (Swagger UI: http://localhost:3001/swagger-ui.html)
+#   docker compose down             stop, keep the data
+#   docker compose down -v          stop and delete the database
+#
+# The API is built from ../karatly-api (the two repositories sit side by side). Once the API
+# publishes images, this switches to a released image like Duewise's compose does.
+# Port 3001 (not 3000) so it runs next to duewise-web.
+name: karatly-web
+
+services:
+  postgres:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_DB: karatly
+      POSTGRES_USER: karatly
+      POSTGRES_PASSWORD: karatly
+    volumes:
+      - karatly-web-pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U karatly -d karatly']
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  api:
+    build: ../karatly-api
+    image: karatly-api:local
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      DB_URL: jdbc:postgresql://postgres:5432/karatly
+      DB_USERNAME: karatly
+      DB_PASSWORD: karatly
+      KARATLY_TIME_ZONE: ${KARATLY_TIME_ZONE:-Asia/Kolkata}
+    # The browser reaches the API through the web app. It is also published on 8091 (only on this
+    # computer) for Postman or curl, so it does not clash with an API you run from IntelliJ on 8081.
+    ports:
+      - '127.0.0.1:${API_PORT:-8091}:8081'
+
+  web:
+    build: .
+    image: karatly-web:local
+    depends_on:
+      api:
+        condition: service_started
+    environment:
+      KARATLY_API_URL: http://api:8081
+    ports:
+      - '${WEB_PORT:-3001}:8080'
+
+volumes:
+  karatly-web-pgdata:

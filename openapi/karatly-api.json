@@ -1,0 +1,78 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "Karatly API",
+    "version": "0.1.0-SNAPSHOT",
+    "description": "Hand-written for the skeleton. Replace with the real document: npm run fetch:api && npm run generate:api"
+  },
+  "paths": {
+    "/api/v1/metals": {
+      "get": {
+        "tags": ["Reference data"],
+        "summary": "List metals",
+        "operationId": "listMetals",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": { "schema": { "type": "array", "items": { "$ref": "#/components/schemas/Metal" } } }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/metals/{code}": {
+      "get": {
+        "tags": ["Reference data"],
+        "summary": "Get one metal by its ISO 4217 code",
+        "operationId": "getMetal",
+        "parameters": [{ "name": "code", "in": "path", "required": true, "schema": { "type": "string" } }],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Metal" } } }
+          }
+        }
+      }
+    },
+    "/api/v1/units": {
+      "get": {
+        "tags": ["Reference data"],
+        "summary": "List weight units",
+        "operationId": "listUnits",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": { "type": "array", "items": { "$ref": "#/components/schemas/WeightUnit" } }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "Metal": {
+        "type": "object",
+        "required": ["code", "name"],
+        "properties": {
+          "code": { "type": "string", "description": "ISO 4217 metal code", "example": "XAU" },
+          "name": { "type": "string", "example": "Gold" }
+        }
+      },
+      "WeightUnit": {
+        "type": "object",
+        "required": ["code", "name", "symbol", "gramsPerUnit"],
+        "properties": {
+          "code": { "type": "string", "example": "TOLA" },
+          "name": { "type": "string", "example": "Tola" },
+          "symbol": { "type": "string", "example": "tola" },
+          "gramsPerUnit": { "type": "number", "description": "How many grams one of this unit is", "example": 11.6638038 }
+        }
+      }
+    }
+  }
+}
