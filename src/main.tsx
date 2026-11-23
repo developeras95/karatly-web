@@ -5,6 +5,7 @@ import { QueryClientProvider } from '@tanstack/react-query';
 import CssBaseline from '@mui/material/CssBaseline';
 import { ThemeProvider } from '@mui/material/styles';
 import { App } from './App';
+import { NotificationProvider } from './components/Notifications';
 import { queryClient } from './api/queryClient';
 import { theme } from './theme';
 
@@ -13,9 +14,11 @@ createRoot(document.getElementById('root')!).render(
     <ThemeProvider theme={theme} defaultMode="system">
       <CssBaseline />
       <QueryClientProvider client={queryClient}>
-        <BrowserRouter>
-          <App />
-        </BrowserRouter>
+        <NotificationProvider>
+          <BrowserRouter>
+            <App />
+          </BrowserRouter>
+        </NotificationProvider>
       </QueryClientProvider>
     </ThemeProvider>
   </StrictMode>,

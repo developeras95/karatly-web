@@ -13,6 +13,7 @@ import Tooltip from '@mui/material/Tooltip';
 import Typography from '@mui/material/Typography';
 import { useColorScheme } from '@mui/material/styles';
 import DashboardIcon from '@mui/icons-material/SpaceDashboardOutlined';
+import RatesIcon from '@mui/icons-material/ShowChartOutlined';
 import MenuIcon from '@mui/icons-material/Menu';
 import LightIcon from '@mui/icons-material/LightModeOutlined';
 import DarkIcon from '@mui/icons-material/DarkModeOutlined';
@@ -26,8 +27,11 @@ interface NavItem {
   icon: ReactNode;
 }
 
-// Holdings, Transactions, Sell simulator and Rates are added here as their pages arrive (M2–M4).
-const NAV_ITEMS: NavItem[] = [{ to: '/', label: 'Dashboard', icon: <DashboardIcon /> }];
+// Holdings, Transactions and the Sell simulator are added here as their pages arrive (M2, M3).
+const NAV_ITEMS: NavItem[] = [
+  { to: '/', label: 'Dashboard', icon: <DashboardIcon /> },
+  { to: '/rates', label: 'Rates', icon: <RatesIcon /> },
+];
 
 function Navigation({ onNavigate }: { onNavigate?: () => void }) {
   return (

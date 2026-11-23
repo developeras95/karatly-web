@@ -4,7 +4,8 @@ The web app for **Karatly**: your precious metals, measured. It talks to
 [karatly-api](../karatly-api); the plan, calculation rules and data model are in the API's
 [docs/requirements-and-design.md](../karatly-api/docs/requirements-and-design.md).
 
-> Status: **skeleton (milestone M0)**. A dashboard that shows the API status and the reference data it serves.
+> Status: **milestone M1 (rates)**. Dashboard, and a rates page with today's rates per purity, history, manual
+> rates, premiums and provider quotas. Needs karatly-api with M1.
 
 ## Stack
 
@@ -48,7 +49,7 @@ the first time the API runs.)
 src/
   api/          typed client, React Query hooks per API area, error handling
   components/   layout and shared components
-  pages/        one folder per area as they arrive (holdings, transactions, rates)
+  pages/        one folder per area: rates/ (M1), then holdings and transactions
   lib/          formatting helpers
   test/         MSW mock API and render helper
 ```
