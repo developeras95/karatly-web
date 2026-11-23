@@ -55,6 +55,142 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/purities": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List purities */
+        get: operations["listPurities"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/rates/latest": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Latest rate of every metal */
+        get: operations["latest"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/rates/history": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Rate history of one metal */
+        get: operations["history"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/rates": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Enter a rate by hand */
+        post: operations["addManual"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/rates/refresh": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Fetch rates now */
+        post: operations["refresh"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/rates/providers": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Rate providers */
+        get: operations["providers"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/rates/premiums": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Premium over spot per metal */
+        get: operations["premiums"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/rates/premiums/{metal}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Change a metal's premium */
+        put: operations["updatePremium"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -80,6 +216,85 @@ export interface components {
              * @example 11.6638038
              */
             gramsPerUnit: number;
+        };
+        /** @enum {string} */
+        RateSource: "GOLDPRICE_DEV" | "GOLDAPI_IO" | "MANUAL";
+        Purity: {
+            id: number;
+            metal: string;
+            label: string;
+            fineness: number;
+        };
+        PurityPrice: {
+            label: string;
+            fineness: number;
+            pricePerGram: number;
+        };
+        Rate: {
+            metal: string;
+            metalName: string;
+            currency: string;
+            /** Format: date */
+            date: string;
+            pricePerGram: number;
+            spotPricePerGram?: number | null;
+            premiumPercent: number;
+            source: components["schemas"]["RateSource"];
+            /** Format: date-time */
+            pricedAt: string;
+            stale: boolean;
+            purities: components["schemas"]["PurityPrice"][];
+        };
+        RateHistoryPoint: {
+            /** Format: date */
+            date: string;
+            pricePerGram: number;
+            source: components["schemas"]["RateSource"];
+        };
+        RateHistory: {
+            metal: string;
+            currency: string;
+            /** Format: date */
+            from: string;
+            /** Format: date */
+            to: string;
+            points: components["schemas"]["RateHistoryPoint"][];
+        };
+        ManualRateRequest: {
+            metal: string;
+            /** Format: date */
+            date?: string;
+            pricePerGram: number;
+        };
+        RefreshResult: {
+            provider: components["schemas"]["RateSource"];
+            /** @enum {string} */
+            status: "FETCHED" | "NOT_DUE" | "UNAVAILABLE" | "OVER_BUDGET" | "FAILED";
+            metals: string[];
+            message?: string | null;
+        };
+        ProviderStatus: {
+            provider: components["schemas"]["RateSource"];
+            metals: string[];
+            available: boolean;
+            unavailableReason?: string | null;
+            ttlMinutes: number;
+            requestsThisMonth: number;
+            monthlyBudget: number;
+            /** Format: date-time */
+            lastFetchAt?: string | null;
+            lastFetchSucceeded?: boolean | null;
+            /** Format: date-time */
+            nextFetchDue: string;
+        };
+        Premium: {
+            metal: string;
+            premiumPercent: number;
+            /** Format: date-time */
+            updatedAt: string;
+        };
+        PremiumRequest: {
+            premiumPercent: number;
         };
     };
     responses: never;
@@ -148,6 +363,184 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["WeightUnit"][];
+                };
+            };
+        };
+    };
+    listPurities: {
+        parameters: {
+            query?: {
+                metal?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Purity"][];
+                };
+            };
+        };
+    };
+    latest: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Rate"][];
+                };
+            };
+        };
+    };
+    history: {
+        parameters: {
+            query: {
+                metal: string;
+                from?: string;
+                to?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RateHistory"];
+                };
+            };
+        };
+    };
+    addManual: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ManualRateRequest"];
+            };
+        };
+        responses: {
+            /** @description Created */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Rate"];
+                };
+            };
+        };
+    };
+    refresh: {
+        parameters: {
+            query?: {
+                force?: boolean;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RefreshResult"][];
+                };
+            };
+        };
+    };
+    providers: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ProviderStatus"][];
+                };
+            };
+        };
+    };
+    premiums: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Premium"][];
+                };
+            };
+        };
+    };
+    updatePremium: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                metal: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PremiumRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Premium"];
                 };
             };
         };

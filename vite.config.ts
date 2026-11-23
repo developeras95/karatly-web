@@ -14,7 +14,7 @@ export default defineConfig(({ mode }) => {
   return {
     plugins: [react()],
     build: {
-      // One chunk for now (MUI is most of it); pages will be loaded on demand once there are several.
+      // Pages are loaded on demand (see App.tsx); the rates page carries the chart library.
       chunkSizeWarningLimit: 800,
     },
     server: {

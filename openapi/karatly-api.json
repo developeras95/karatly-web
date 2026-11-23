@@ -3,19 +3,28 @@
   "info": {
     "title": "Karatly API",
     "version": "0.1.0-SNAPSHOT",
-    "description": "Hand-written for the skeleton. Replace with the real document: npm run fetch:api && npm run generate:api"
+    "description": "Written by hand from the API source (M1). Replace with the real document: npm run fetch:api && npm run generate:api"
   },
   "paths": {
     "/api/v1/metals": {
       "get": {
-        "tags": ["Reference data"],
+        "tags": [
+          "Reference data"
+        ],
         "summary": "List metals",
         "operationId": "listMetals",
         "responses": {
           "200": {
             "description": "OK",
             "content": {
-              "application/json": { "schema": { "type": "array", "items": { "$ref": "#/components/schemas/Metal" } } }
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Metal"
+                  }
+                }
+              }
             }
           }
         }
@@ -23,21 +32,40 @@
     },
     "/api/v1/metals/{code}": {
       "get": {
-        "tags": ["Reference data"],
+        "tags": [
+          "Reference data"
+        ],
         "summary": "Get one metal by its ISO 4217 code",
         "operationId": "getMetal",
-        "parameters": [{ "name": "code", "in": "path", "required": true, "schema": { "type": "string" } }],
+        "parameters": [
+          {
+            "name": "code",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
         "responses": {
           "200": {
             "description": "OK",
-            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Metal" } } }
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Metal"
+                }
+              }
+            }
           }
         }
       }
     },
     "/api/v1/units": {
       "get": {
-        "tags": ["Reference data"],
+        "tags": [
+          "Reference data"
+        ],
         "summary": "List weight units",
         "operationId": "listUnits",
         "responses": {
@@ -45,7 +73,274 @@
             "description": "OK",
             "content": {
               "application/json": {
-                "schema": { "type": "array", "items": { "$ref": "#/components/schemas/WeightUnit" } }
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/WeightUnit"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/purities": {
+      "get": {
+        "tags": [
+          "Reference data"
+        ],
+        "summary": "List purities",
+        "operationId": "listPurities",
+        "parameters": [
+          {
+            "name": "metal",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Purity"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/rates/latest": {
+      "get": {
+        "tags": [
+          "Rates"
+        ],
+        "summary": "Latest rate of every metal",
+        "operationId": "latest",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Rate"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/rates/history": {
+      "get": {
+        "tags": [
+          "Rates"
+        ],
+        "summary": "Rate history of one metal",
+        "operationId": "history",
+        "parameters": [
+          {
+            "name": "metal",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "from",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "date"
+            }
+          },
+          {
+            "name": "to",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "date"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RateHistory"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/rates": {
+      "post": {
+        "tags": [
+          "Rates"
+        ],
+        "summary": "Enter a rate by hand",
+        "operationId": "addManual",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ManualRateRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Rate"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/rates/refresh": {
+      "post": {
+        "tags": [
+          "Rates"
+        ],
+        "summary": "Fetch rates now",
+        "operationId": "refresh",
+        "parameters": [
+          {
+            "name": "force",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "boolean",
+              "default": true
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/RefreshResult"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/rates/providers": {
+      "get": {
+        "tags": [
+          "Rates"
+        ],
+        "summary": "Rate providers",
+        "operationId": "providers",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ProviderStatus"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/rates/premiums": {
+      "get": {
+        "tags": [
+          "Rates"
+        ],
+        "summary": "Premium over spot per metal",
+        "operationId": "premiums",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Premium"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/rates/premiums/{metal}": {
+      "put": {
+        "tags": [
+          "Rates"
+        ],
+        "summary": "Change a metal's premium",
+        "operationId": "updatePremium",
+        "parameters": [
+          {
+            "name": "metal",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PremiumRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Premium"
+                }
               }
             }
           }
@@ -57,20 +352,351 @@
     "schemas": {
       "Metal": {
         "type": "object",
-        "required": ["code", "name"],
+        "required": [
+          "code",
+          "name"
+        ],
         "properties": {
-          "code": { "type": "string", "description": "ISO 4217 metal code", "example": "XAU" },
-          "name": { "type": "string", "example": "Gold" }
+          "code": {
+            "type": "string",
+            "description": "ISO 4217 metal code",
+            "example": "XAU"
+          },
+          "name": {
+            "type": "string",
+            "example": "Gold"
+          }
         }
       },
       "WeightUnit": {
         "type": "object",
-        "required": ["code", "name", "symbol", "gramsPerUnit"],
+        "required": [
+          "code",
+          "name",
+          "symbol",
+          "gramsPerUnit"
+        ],
         "properties": {
-          "code": { "type": "string", "example": "TOLA" },
-          "name": { "type": "string", "example": "Tola" },
-          "symbol": { "type": "string", "example": "tola" },
-          "gramsPerUnit": { "type": "number", "description": "How many grams one of this unit is", "example": 11.6638038 }
+          "code": {
+            "type": "string",
+            "example": "TOLA"
+          },
+          "name": {
+            "type": "string",
+            "example": "Tola"
+          },
+          "symbol": {
+            "type": "string",
+            "example": "tola"
+          },
+          "gramsPerUnit": {
+            "type": "number",
+            "description": "How many grams one of this unit is",
+            "example": 11.6638038
+          }
+        }
+      },
+      "RateSource": {
+        "type": "string",
+        "enum": [
+          "GOLDPRICE_DEV",
+          "GOLDAPI_IO",
+          "MANUAL"
+        ]
+      },
+      "Purity": {
+        "type": "object",
+        "required": [
+          "id",
+          "metal",
+          "label",
+          "fineness"
+        ],
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "metal": {
+            "type": "string"
+          },
+          "label": {
+            "type": "string"
+          },
+          "fineness": {
+            "type": "number"
+          }
+        }
+      },
+      "PurityPrice": {
+        "type": "object",
+        "required": [
+          "label",
+          "fineness",
+          "pricePerGram"
+        ],
+        "properties": {
+          "label": {
+            "type": "string"
+          },
+          "fineness": {
+            "type": "number"
+          },
+          "pricePerGram": {
+            "type": "number"
+          }
+        }
+      },
+      "Rate": {
+        "type": "object",
+        "required": [
+          "metal",
+          "metalName",
+          "currency",
+          "date",
+          "pricePerGram",
+          "premiumPercent",
+          "source",
+          "pricedAt",
+          "stale",
+          "purities"
+        ],
+        "properties": {
+          "metal": {
+            "type": "string"
+          },
+          "metalName": {
+            "type": "string"
+          },
+          "currency": {
+            "type": "string"
+          },
+          "date": {
+            "type": "string",
+            "format": "date"
+          },
+          "pricePerGram": {
+            "type": "number"
+          },
+          "spotPricePerGram": {
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "premiumPercent": {
+            "type": "number"
+          },
+          "source": {
+            "$ref": "#/components/schemas/RateSource"
+          },
+          "pricedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "stale": {
+            "type": "boolean"
+          },
+          "purities": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PurityPrice"
+            }
+          }
+        }
+      },
+      "RateHistoryPoint": {
+        "type": "object",
+        "required": [
+          "date",
+          "pricePerGram",
+          "source"
+        ],
+        "properties": {
+          "date": {
+            "type": "string",
+            "format": "date"
+          },
+          "pricePerGram": {
+            "type": "number"
+          },
+          "source": {
+            "$ref": "#/components/schemas/RateSource"
+          }
+        }
+      },
+      "RateHistory": {
+        "type": "object",
+        "required": [
+          "metal",
+          "currency",
+          "from",
+          "to",
+          "points"
+        ],
+        "properties": {
+          "metal": {
+            "type": "string"
+          },
+          "currency": {
+            "type": "string"
+          },
+          "from": {
+            "type": "string",
+            "format": "date"
+          },
+          "to": {
+            "type": "string",
+            "format": "date"
+          },
+          "points": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RateHistoryPoint"
+            }
+          }
+        }
+      },
+      "ManualRateRequest": {
+        "type": "object",
+        "required": [
+          "metal",
+          "pricePerGram"
+        ],
+        "properties": {
+          "metal": {
+            "type": "string"
+          },
+          "date": {
+            "type": "string",
+            "format": "date"
+          },
+          "pricePerGram": {
+            "type": "number"
+          }
+        }
+      },
+      "RefreshResult": {
+        "type": "object",
+        "required": [
+          "provider",
+          "status",
+          "metals"
+        ],
+        "properties": {
+          "provider": {
+            "$ref": "#/components/schemas/RateSource"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "FETCHED",
+              "NOT_DUE",
+              "UNAVAILABLE",
+              "OVER_BUDGET",
+              "FAILED"
+            ]
+          },
+          "metals": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "message": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        }
+      },
+      "ProviderStatus": {
+        "type": "object",
+        "required": [
+          "provider",
+          "metals",
+          "available",
+          "ttlMinutes",
+          "requestsThisMonth",
+          "monthlyBudget",
+          "nextFetchDue"
+        ],
+        "properties": {
+          "provider": {
+            "$ref": "#/components/schemas/RateSource"
+          },
+          "metals": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "available": {
+            "type": "boolean"
+          },
+          "unavailableReason": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "ttlMinutes": {
+            "type": "integer"
+          },
+          "requestsThisMonth": {
+            "type": "integer"
+          },
+          "monthlyBudget": {
+            "type": "integer"
+          },
+          "lastFetchAt": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
+          "lastFetchSucceeded": {
+            "type": [
+              "boolean",
+              "null"
+            ]
+          },
+          "nextFetchDue": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "Premium": {
+        "type": "object",
+        "required": [
+          "metal",
+          "premiumPercent",
+          "updatedAt"
+        ],
+        "properties": {
+          "metal": {
+            "type": "string"
+          },
+          "premiumPercent": {
+            "type": "number"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "PremiumRequest": {
+        "type": "object",
+        "required": [
+          "premiumPercent"
+        ],
+        "properties": {
+          "premiumPercent": {
+            "type": "number"
+          }
         }
       }
     }
